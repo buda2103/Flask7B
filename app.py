@@ -10,13 +10,12 @@ app = Flask(__name__)
 @app.route("/")
 def index():
     return render_template("app.html")
- @app.route("/")
-def index():
-    return render_template("Pago_Curso.html")
 
-@app.route("/alumnos")
+
+@app.route("/Registrar")
 def alumnos():
-    return render_template("alumnos.html")
+    return render_template("Pago_Curso.html")
+    
 
 @app.route("/alumnos/guardar", methods=["POST"])
 def alumnosGuardar():
