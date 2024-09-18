@@ -10,7 +10,7 @@ app = Flask(__name__)
 @app.route("/")
 def index():
     return render_template("app.html")
- @app.route("/Pago_Curso")
+ @app.route("/")
 def index():
     return render_template("Pago_Curso.html")
 
