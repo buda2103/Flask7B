@@ -9,7 +9,7 @@ def index():
 
 @app.route("/Registrar")
 def alumnos():
-    return render_template("Pago_Curso.html")
+    return render_template("Pago-Curso.html")
 
 @app.route("/alumnos/guardar", methods=["POST"])
 def alumnosGuardar():
