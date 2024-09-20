@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Pago Curso</title>
 </head>
 <body>
@@ -16,13 +15,12 @@
         <li>Selecciona las excepciones y desarrollalas con el mensaje que hayas definido.</li>
     </ul>
     <p><b>Nombre del Alumno: </b></p>
-    <!-- table index 1 -->
+    
+    <!-- Tabla CDU -->
     <table class="table table-sm">
         <thead>
             <tr> 
-                <th colspan="2">
-                    CDU
-                </th>
+                <th colspan="2">CDU</th>
             </tr>
         </thead>
         <tbody>
@@ -71,26 +69,41 @@
             </tr>
         </tbody>
     </table>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <!-- Pusher & Session Storage Script -->
     <script>
         window.addEventListener("load", function (event) {
             // Enable pusher logging - don't include this in production
-            Pusher.logToConsole = true
+            Pusher.logToConsole = true;
             
-             var pusher = new Pusher('2358693f2b619b363f59', {
-             cluster: 'us2'
-            })
+            var pusher = new Pusher('2358693f2b619b363f59', {
+                cluster: 'us2'
+            });
 
-            //                            Canal
+            // Canal de Pusher
             var channel = pusher.subscribe("CanalPago_curso");
 
-            //           Evento
+            // Evento de Pusher
             channel.bind("pago-curso", function (pago) {
-                 alert("Ocurrió el evento")
-                console.log(pago-curso)
-            })
-        })
-    </script>   
+                alert("Ocurrió el evento");
+                console.log(pago-curso);
+            });
+
+            // Detectar cuando se recarga en otra pestaña
+            if (sessionStorage.getItem('loaded')) {
+                alert("Página recargada en otra pestaña");
+            } else {
+                sessionStorage.setItem('loaded', true);
+            }
+
+            // Eliminar la clave 'loaded' cuando se cierra la pestaña
+            window.addEventListener("beforeunload", function () {
+                sessionStorage.removeItem('loaded');
+            });
+        });
+    </script>
 </body>
 </html>
