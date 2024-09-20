@@ -42,10 +42,16 @@ def buscar():
 @app.route("/registrar", methods=["GET"])
 def registrar():
     data = {
-        "telefono": request.args.get("telefono"),
-        "archivo": request.args.get("archivo")
+        "telefono": request.args.get("Telefono"),
+        "archivo": request.args.get("Archivo")
     }
-    
+    mycursor = mydb.cursor()
+
+sql = "INSERT INTO tst0_cursos_pagos (Telefono, Archivo) VALUES (%s, %s)"
+val = (args["Telefono"], args["Archivo"], datetime.datetime.now(pytz.timezone("America/Matamoros")))
+mycursor.execute(sql, val)
+
+ con.commit()
     # Activar el evento en Pusher
     pusher_client.trigger("CanalPago_curso", "pago-curso", data)
     return "Evento registrado con éxito"
