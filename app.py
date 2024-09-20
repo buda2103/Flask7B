@@ -23,7 +23,7 @@ pusher_client = pusher.Pusher(
 )
 
 # Página principal
-@app.route("/Pago-Curso")
+@app.route("/")
 def index():
     return render_template("Pago-Curso.html")
 
