@@ -1,59 +1,55 @@
-from flask import Flask
-
-from flask import render_template
-from flask import request
-
+from flask import Flask, render_template, request, jsonify
 import pusher
-
 import mysql.connector
-import datetime
-import pytz
 
+# Configuración de la base de datos
 con = mysql.connector.connect(
-  host="185.232.14.52",
-  database="u760464709_tst_sep",
-  user="u760464709_tst_sep_usr",
-  password="dJ0CIAFF="
+    host="185.232.14.52",
+    database="u760464709_tst_sep",
+    user="u760464709_tst_sep_usr",
+    password="dJ0CIAFF="
 )
 
+# Inicializar la aplicación Flask
 app = Flask(__name__)
 
+# Configurar Pusher
+pusher_client = pusher.Pusher(
+    app_id="1867163",
+    key="2358693f2b619b363f59",
+    secret="880f60b50e86e4555c43",
+    cluster="us2",
+    ssl=True
+)
+
+# Página principal
 @app.route("/")
 def index():
-    con.close()
     return render_template("Pago-Curso.html")
 
-@app.route("/alumnos")
-def alumnos():
-    con.close()
-    return render_template("alumnos.html")
-
-@app.route("/alumnos/guardar", methods=["POST"])
-def alumnosGuardar():
-    con.close()
-    matricula      = request.form["txtMatriculaFA"]
-    nombreapellido = request.form["txtNombreApellidoFA"]
-    return f"Matrícula {matricula} Nombre y Apellido {nombreapellido}"
-
+# Ruta para buscar pagos en la base de datos
 @app.route("/buscar")
 def buscar():
     if not con.is_connected():
         con.reconnect()
     cursor = con.cursor()
     cursor.execute("SELECT * FROM tst0_cursos_pagos")
-    
     registros = cursor.fetchall()
+    cursor.close()
+    return jsonify(registros)  # Retorna los registros en formato JSON
 
-    return registros
-
+# Ruta para registrar un nuevo pago y activar el evento Pusher
 @app.route("/registrar", methods=["GET"])
 def registrar():
- pusher_client = pusher.Pusher(
-    app_id = "1867163"
-    key = "2358693f2b619b363f59"
-    secret = "880f60b50e86e4555c43"
-    cluster = "us2"
-    ssl=True
-    )
+    data = {
+        "telefono": request.args.get("telefono"),
+        "archivo": request.args.get("archivo")
+    }
+    
+    # Activar el evento en Pusher
+    pusher_client.trigger("CanalPago_curso", "pago-curso", data)
+    return "Evento registrado con éxito"
 
-    pusher_client.trigger("CanalPago_curso", "pago-curso", request.args)
+# Iniciar la aplicación
+if __name__ == "__main__":
+    app.run(debug=True)
