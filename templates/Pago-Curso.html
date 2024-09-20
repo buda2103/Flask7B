@@ -75,8 +75,25 @@
 
     <script>
         window.addEventListener("load", function (event) {
-            // Enable pusher logging - don't include this in production
-            Pusher.logToConsole = true
+            function buscar() {
+                $.get("/buscar", function (respuesta) {
+                    console.log(respuesta)
+                      $("#tbodyPagoCurso").html("")
+                    
+                        for (var x in respuesta) {
+                        var PagoCurso = respuesta[x]
+                        $("#tbodyPagoCurso").append(`<tr>
+                            <td>${PagoCurso[1]}</td>
+                            <td>${PagoCurso[2]}</td>
+                            <td></td>
+                        </tr>`)
+                    }
+                })
+            }
+
+            buscar()
+
+               Pusher.logToConsole = true
             
              var pusher = new Pusher('2358693f2b619b363f59', {
              cluster: 'us2'
@@ -87,8 +104,8 @@
 
             //           Evento
             channel.bind("pago-curso", function (pago) {
-                 alert("Ocurrió el evento")
-                console.log(pago-curso)
+              //   alert("Ocurrió el evento")
+              //  console.log(pago-curso)
             })
         })
     </script>   
