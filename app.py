@@ -42,8 +42,8 @@ def buscar():
 @app.route("/registrar", methods=["GET"])
 def registrar():
     data = {
-        "telefono": request.args.get("Telefono"),
-        "archivo": request.args.get("Archivo")
+        "Telefono": request.args.get("Telefono"),
+        "Archivo": request.args.get("Archivo")
     }
     mycursor = mydb.cursor()
 
