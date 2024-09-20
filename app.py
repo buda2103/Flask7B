@@ -18,10 +18,10 @@ con = mysql.connector.connect(
 
 app = Flask(__name__)
 
-@app.route("/app")
+@app.route("/")
 def index():
     con.close()
-    return render_template("app.html")
+    return render_template("Pago-Curso")
 
 @app.route("/alumnos")
 def alumnos():
@@ -40,7 +40,7 @@ def buscar():
     if not con.is_connected():
         con.reconnect()
     cursor = con.cursor()
-    cursor.execute("SELECT * FROM sensor_log")
+    cursor.execute("SELECT * FROM tst0_cursos_pagos")
     
     registros = cursor.fetchall()
 
@@ -48,12 +48,12 @@ def buscar():
 
 @app.route("/registrar", methods=["GET"])
 def registrar():
-    pusher_client = pusher.Pusher(
-        app_id="1714541",
-        key="cda1cc599395d699a2af",
-        secret="9e9c00fc36600060d9e2",
-        cluster="us2",
-        ssl=True
+ pusher_client = pusher.Pusher(
+    app_id = "1867163"
+    key = "2358693f2b619b363f59"
+    secret = "880f60b50e86e4555c43"
+    cluster = "us2"
+    ssl=True
     )
 
     pusher_client.trigger("canalRegistrosTemperaturaHumedad", "registroTemperaturaHumedad", request.args)
