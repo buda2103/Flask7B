@@ -18,7 +18,7 @@ con = mysql.connector.connect(
 
 app = Flask(__name__)
 
-@app.route("/")
+@app.route("/app")
 def index():
     con.close()
     return render_template("app.html")
