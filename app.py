@@ -34,31 +34,29 @@ def index():
 def buscar():
     if not con.is_connected():
         con.reconnect()
+
     cursor = con.cursor()
-    cursor.execute("SELECT * FROM tst0_cursos_pagos")
+    cursor.execute("SELECT * FROM tst0_cursos_pagos ORDER BY Id_Curso_Pago DESC")
     registros = cursor.fetchall()
-    cursor.close()
-    return jsonify(registros)  # Retorna los registros en formato JSON
+
+    con.close()
+
+    return registros
 
 # Ruta para registrar un nuevo pago y activar el evento Pusher
 @app.route("/registrar", methods=["GET"])
 def registrar():
-    data = {
-        "Telefono": request.args.get("Telefono"),
-        "Archivo": request.args.get("Archivo")
-    }
+    args = request.args
 
-    # Conectar a la base de datos
     if not con.is_connected():
         con.reconnect()
-    
+
     cursor = con.cursor()
-    
     # Insertar el registro en la base de datos
     sql = "INSERT INTO tst0_cursos_pagos (Telefono, Archivo, Fecha) VALUES (%s, %s, %s)"
     val = (
-        data["Telefono"], 
-        data["Archivo"], 
+        args["Telefono"], 
+        args["Archivo"], 
         datetime.datetime.now(pytz.timezone("America/Matamoros"))
     )
     cursor.execute(sql, val)
@@ -68,7 +66,7 @@ def registrar():
     cursor.close()
 
     # Activar el evento en Pusher
-    pusher_client.trigger("CanalPago_curso", "pago-curso", data)
+    pusher_client.trigger("CanalPago_curso", "pago-curso", args)
     
     return "Evento registrado con éxito"
 
