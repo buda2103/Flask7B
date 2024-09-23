@@ -9,17 +9,18 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/jquery.validation/1.19.3/jquery.validate.min.js"></script>
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
 </head>
 <body>
     <p><b>Formulario de Pago del Curso:</b></p>
     <form id="form-pago-curso" enctype="multipart/form-data">
         <div class="form-group">
-            <label for="telefono">Teléfono:</label>
-            <input type="text" id="telefono" name="telefono" class="form-control" required>
+            <label for="Telefono">Teléfono:</label>
+            <input type="text" id="Telefono" name="Telefono" class="form-control" required>
         </div>
         <div class="form-group">
-            <label for="archivo">Archivo (Imágenes o PDF):</label>
-            <input type="file" id="archivo" name="archivo" class="form-control" accept="image/*,application/pdf" required>
+            <label for="Archivo">Archivo (Imágenes o PDF):</label>
+            <input type="file" id="Archivo" name="Archivo" class="form-control" accept="image/*,application/pdf" required>
         </div>
         <button type="submit" class="btn btn-primary">Enviar Comprobante</button>
     </form>
@@ -41,68 +42,56 @@
     </table>
 
     <script>
-        $(document).ready(function () {
-            // Validar formulario
-            $("#form-pago-curso").validate({
-                rules: {
-                    telefono: {
-                        required: true,
-                        digits: true,
-                        minlength: 10,
-                        maxlength: 10
-                    },
-                    archivo: {
-                        required: true,
-                        accept: "image/*,application/pdf"
-                    }
-                },
-                messages: {
-                    telefono: {
-                        required: "El teléfono es obligatorio.",
-                        digits: "Solo se permiten números.",
-                        minlength: "Debe tener 10 dígitos.",
-                        maxlength: "Debe tener 10 dígitos."
-                    },
-                    archivo: {
-                        required: "El archivo es obligatorio.",
-                        accept: "Solo se permiten imágenes o archivos PDF."
-                    }
-                },
-                submitHandler: function (form) {
-                    // Lógica para enviar el formulario si es válido
-                    form.submit();
-                }
-            });
-
-            // Función para buscar datos de pagos
+         window.addEventListener("load", function (event) {
+            // Realizamos un SELECT a la BD con FLASK y lo imprimimos en el TBODY
             function buscar() {
                 $.get("/buscar", function (respuesta) {
-                    $("#tbodyPagoCurso").html(""); // Limpiar la tabla antes de añadir los datos
-                    respuesta.forEach(function (PagoCurso) {
+                    // Imprimimos la respuesta de FLASK con SELECT para saber cómo acceder a cada valor y colocarlos en el TBODY
+                    // console.log(respuesta)
+                   $("#tbodyPagoCurso").html("")
+                    
+                    for (var x in respuesta) {
+                        var Pagocurso = respuesta[x]
                         $("#tbodyPagoCurso").append(`<tr>
-                            <td>${PagoCurso[1]}</td>
-                            <td>${PagoCurso[2]}</td>
-                        </tr>`);
-                    });
-                });
+                            <td>${Pagocurso[1]}</td>
+                            <td>${Pagocurso[2]}</td>
+                            <td>${Pagocurso[3]}</td>
+                        </tr>`)
+                    }
+                })
             }
 
-            // Evento para el botón de búsqueda
-            $("#btn-buscar").on("click", function () {
-                buscar();
-            });
+             buscar()
 
-            // Configuración de Pusher
-            Pusher.logToConsole = true;
-            var pusher = new Pusher('2358693f2b619b363f59', {
-                cluster: 'us2'
-            });
+            Pusher.logToConsole = true
+            
+            var pusher = new Pusher("2358693f2b619b363f59", {
+                cluster: "us2"
+            })
 
-            var channel = pusher.subscribe("CanalPago_curso");
-            channel.bind("pago-curso", function (data) {
-                buscar(); // Actualiza la tabla cuando haya un nuevo pago
-            });
-        });
+            var channel = pusher.subscribe("CanalPago_curso"); 
+             channel.bind("pago-curso", function (Pagocurso) {
+                // 1. Notificar el evento
+                // alert("Ocurrió el evento")
+
+                // 2. Recibir información enviada en el evento
+                // console.log(temperaturaHumedad)
+
+                // 3. Trabajar información enviada por el evento
+                /**
+                $("#tbodyTemperaturaHumedad").prepend(`<tr>
+                    <td>${temperaturaHumedad.temperatura}</td>
+                    <td>${temperaturaHumedad.humedad}</td>
+                    <td></td>
+                </tr>`)
+                */
+
+                // 4. Mandar a llamar otro código luego del evento
+                buscar()
+            })
+        }) 
+
+                    
     </script>
 </body>
 </html>
