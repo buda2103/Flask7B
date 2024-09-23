@@ -4,7 +4,6 @@ import mysql.connector
 import datetime
 import pytz
 
-
 # Configuración de la base de datos
 con = mysql.connector.connect(
     host="185.232.14.52",
@@ -48,18 +47,31 @@ def registrar():
         "Telefono": request.args.get("Telefono"),
         "Archivo": request.args.get("Archivo")
     }
-    mycursor = mydb.cursor()
 
-sql = "INSERT INTO tst0_cursos_pagos (Telefono, Archivo) VALUES (%s, %s)"
-val = (args["Telefono"], args["Archivo"], datetime.datetime.now(pytz.timezone("America/Matamoros")))
-mycursor.execute(sql, val)
+    # Conectar a la base de datos
+    if not con.is_connected():
+        con.reconnect()
+    
+    cursor = con.cursor()
+    
+    # Insertar el registro en la base de datos
+    sql = "INSERT INTO tst0_cursos_pagos (Telefono, Archivo, Fecha) VALUES (%s, %s, %s)"
+    val = (
+        data["Telefono"], 
+        data["Archivo"], 
+        datetime.datetime.now(pytz.timezone("America/Matamoros"))
+    )
+    cursor.execute(sql, val)
+    
+    # Confirmar los cambios
+    con.commit()
+    cursor.close()
 
- con.commit()
     # Activar el evento en Pusher
     pusher_client.trigger("CanalPago_curso", "pago-curso", data)
+    
     return "Evento registrado con éxito"
 
 # Iniciar la aplicación
 if __name__ == "__main__":
     app.run(debug=True)
-    return args
