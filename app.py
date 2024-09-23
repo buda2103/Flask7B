@@ -1,6 +1,9 @@
 from flask import Flask, render_template, request, jsonify
 import pusher
 import mysql.connector
+import datetime
+import pytz
+
 
 # Configuración de la base de datos
 con = mysql.connector.connect(
@@ -59,3 +62,4 @@ mycursor.execute(sql, val)
 # Iniciar la aplicación
 if __name__ == "__main__":
     app.run(debug=True)
+    return args
