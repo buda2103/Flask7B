@@ -53,11 +53,10 @@ def registrar():
 
     cursor = con.cursor()
     # Insertar el registro en la base de datos
-    sql = "INSERT INTO tst0_cursos_pagos (Telefono, Archivo, Fecha) VALUES (%s, %s, %s)"
+    sql = "INSERT INTO tst0_cursos_pagos (Telefono, Archivo ) VALUES (%s, %s)"
     val = (
         args["Telefono"], 
-        "Hola", 
-        datetime.datetime.now(pytz.timezone("America/Matamoros"))
+        "Hola"
     )
     cursor.execute(sql, val)
     
