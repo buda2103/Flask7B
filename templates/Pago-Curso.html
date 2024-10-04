@@ -13,8 +13,10 @@
 </head>
 <body>
     <p><b>Formulario de Pago del Curso:</b></p>
-    <form id="form-pago-curso" enctype="multipart/form-data">
-        <div class="form-group">
+      <form id="frmPagocurso"  method="post">
+         <input type="hidden" id="id" name="id">
+             
+          <div class="form-group">
             <label for="Telefono">Teléfono:</label>
             <input type="text" id="Telefono" name="Telefono" class="form-control" required>
         </div>
@@ -22,7 +24,8 @@
             <label for="Archivo">Archivo (Imágenes o PDF):</label>
             <input type="file" id="Archivo" name="Archivo" class="form-control" accept="image/*,application/pdf" required>
         </div>
-        <button type="submit" class="btn btn-primary">Enviar Comprobante</button>
+        <button type="submit" class="btn btn-primary">Enviar</button>
+        <button type="submit" class="btn btn-danger">Cancelar</button>
     </form>
 
     <!-- Botón para buscar registros -->
@@ -120,15 +123,56 @@
                     for (var x in respuesta) {
                         var Pagocurso = respuesta[x]
                         $("#tbodyPagoCurso").append(`<tr>
-                            <td>${Pagocurso[1]}</td>
-                            <td>${Pagocurso[2]}</td>
-                            <td>${Pagocurso[3]}</td>
+                            <td>${Pagocurso[Telefono]}</td>
+                            <td>${Pagocurso[Archivo]}</td>
+                            <td>
+                            
+                                <button class="btn btn-primary btn-editar" data-id="${Pagocurso["Id_Log"]}">Editar</button>
+                                <button class="btn btn-warning btn-eliminar" data-id="${Pagocurso["Id_Log"]}">Eliminar</button>
+                            </td>
                         </tr>`)
                     }
                 })
             }
 
              buscar()
+          $(document).on("click", ".btn-editar", function (event) {
+                var id = $(this).attr("data-id")
+
+                $.get("/editar", {id: id}, function (respuesta) {
+                    console.log(respuesta)
+                    var Pagocurso = respuesta[0]
+
+                    $("#id")
+                    .val(Pagocurso["Id_Log"])
+                    .trigger("focus")
+
+                    $("#Telefono").val(Pagocurso["Telefono"])
+                    $("#Archivo").val(Pagocurso["Archivo"])
+                })
+            })
+            
+            $(document).on("click", ".btn-eliminar", function (event) {
+                if (!confirm("¿Quieres eliminar el registro del pago?")) {
+                    return
+                }
+
+                var id = $(this).attr("data-id")
+
+                $.post("/eliminar", {id: id})
+            })
+
+            $("#frmPagocurso")
+            .submit(function (event)  {
+                event.preventDefault()
+
+                $.post("/guardar", $(this).serialize(), function (respuesta) {
+                    $("#frmPagocurso").get(0).reset()
+                })
+            })
+            .on("reset", function (event) {
+                $("#id").val("")
+            
 
             Pusher.logToConsole = true
             
