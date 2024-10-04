@@ -56,7 +56,8 @@ def registrar():
     sql = "INSERT INTO tst0_cursos_pagos (Telefono, Archivo ) VALUES (%s, %s)"
     val = (
         args["Telefono"], 
-        "Hola"
+        args["Archivo"], 
+
     )
     cursor.execute(sql, val)
     
