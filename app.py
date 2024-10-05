@@ -82,7 +82,49 @@ def registrar():
 
     notificarActualizacizarTelefonoArchivo()    
     return make_response(jsonify({}))
-    
+
+@app.route("/editar", methods=["GET"]
+ def editar():
+    if not con.is_connected():
+        con.reconnect()
+
+    id = request.args["id"]
+
+    cursor = con.cursor(dictionary=True)
+    sql    = """
+    SELECT Id_Curso_Pago, Telefono, Archivo FROM tst0_cursos_pagos
+    WHERE Id_Curso_Pago = %s
+    """
+    val    = (id,)
+
+    cursor.execute(sql, val)
+    registros = cursor.fetchall()
+    con.close()
+
+    return make_response(jsonify(registros))
+     
+@app.route("/eliminar", methods=["POST"])
+ def eliminar():
+    if not con.is_connected():
+        con.reconnect()
+
+    id = request.form["id"]
+
+    cursor = con.cursor(dictionary=True)
+    sql    = """
+    DELETE FROM Id_Curso_Pago
+    WHERE Id_Curso_Pago = %s
+    """
+    val    = (id,)
+
+    cursor.execute(sql, val)
+    con.commit()
+    con.close()
+
+    notificarActualizacizarTelefonoArchivo()
+
+    return make_response(jsonify({}))
+     
 # Iniciar la aplicación
 if __name__ == "__main__":
     app.run(debug=True)
