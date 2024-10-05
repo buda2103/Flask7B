@@ -1,8 +1,6 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, make_response
 import pusher
 import mysql.connector
-import datetime
-import pytz
 
 # Configuración de la base de datos
 con = mysql.connector.connect(
@@ -16,7 +14,6 @@ con = mysql.connector.connect(
 app = Flask(__name__)
 
 # Configurar Pusher
-def notificarActualizacizarTelefonoArchivo():
 pusher_client = pusher.Pusher(
     app_id="1867163",
     key="2358693f2b619b363f59",
@@ -24,7 +21,9 @@ pusher_client = pusher.Pusher(
     cluster="us2",
     ssl=True
 )
-    pusher_client.trigger("CanalPago_curso", "pago-curso", args)
+
+def notificarActualizacionTelefonoArchivo():
+    pusher_client.trigger("CanalPago_curso", "pago-curso", {})
 
 # Página principal
 @app.route("/")
@@ -39,25 +38,25 @@ def buscar():
 
     cursor = con.cursor()
     cursor.execute("""
-    "SELECT  Id_Curso_Pago  Telefono, Archivo FROM tst0_cursos_pagos 
+    SELECT Id_Curso_Pago, Telefono, Archivo FROM tst0_cursos_pagos 
     ORDER BY Id_Curso_Pago DESC
     LIMIT 10 OFFSET 0
     """)
     
     registros = cursor.fetchall()
-
     con.close()
 
     return make_response(jsonify(registros))
+
 # Ruta para registrar un nuevo pago y activar el evento Pusher
 @app.route("/registrar", methods=["POST"])
 def registrar():
     if not con.is_connected():
         con.reconnect()
-                                 
-    id       = request.form["id"]
-    Telefono = request.form["Telefono"]
-    Archivo  = request.form["Archivo"]
+
+    id = request.form.get("id")
+    Telefono = request.form.get("Telefono")
+    Archivo = request.form.get("Archivo")
     
     cursor = con.cursor()
 
@@ -65,66 +64,68 @@ def registrar():
         sql = """
         UPDATE tst0_cursos_pagos SET
         Telefono = %s,
-        Archivo     = %s
+        Archivo = %s
         WHERE Id_Curso_Pago = %s
         """
         val = (Telefono, Archivo, id)
     else:
         sql = """
         INSERT INTO tst0_cursos_pagos (Telefono, Archivo)
-                        VALUES (%s,          %s)
+        VALUES (%s, %s)
         """
-        val =                  (Telefono, Archivo)
+        val = (Telefono, Archivo)
     
     cursor.execute(sql, val)
     con.commit()
     cursor.close()
 
-    notificarActualizacizarTelefonoArchivo()    
+    notificarActualizacionTelefonoArchivo()
     return make_response(jsonify({}))
 
-@app.route("/editar", methods=["GET"]
- def editar():
+# Ruta para editar un registro existente
+@app.route("/editar", methods=["GET"])
+def editar():
     if not con.is_connected():
         con.reconnect()
 
-    id = request.args["id"]
+    id = request.args.get("id")
 
     cursor = con.cursor(dictionary=True)
-    sql    = """
+    sql = """
     SELECT Id_Curso_Pago, Telefono, Archivo FROM tst0_cursos_pagos
     WHERE Id_Curso_Pago = %s
     """
-    val    = (id,)
+    val = (id,)
 
     cursor.execute(sql, val)
     registros = cursor.fetchall()
     con.close()
 
     return make_response(jsonify(registros))
-     
+
+# Ruta para eliminar un registro
 @app.route("/eliminar", methods=["POST"])
- def eliminar():
+def eliminar():
     if not con.is_connected():
         con.reconnect()
 
-    id = request.form["id"]
+    id = request.form.get("id")
 
-    cursor = con.cursor(dictionary=True)
-    sql    = """
-    DELETE FROM Id_Curso_Pago
+    cursor = con.cursor()
+    sql = """
+    DELETE FROM tst0_cursos_pagos
     WHERE Id_Curso_Pago = %s
     """
-    val    = (id,)
+    val = (id,)
 
     cursor.execute(sql, val)
     con.commit()
     con.close()
 
-    notificarActualizacizarTelefonoArchivo()
+    notificarActualizacionTelefonoArchivo()
 
     return make_response(jsonify({}))
-     
+
 # Iniciar la aplicación
 if __name__ == "__main__":
     app.run(debug=True)
