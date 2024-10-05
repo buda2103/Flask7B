@@ -16,6 +16,7 @@ con = mysql.connector.connect(
 app = Flask(__name__)
 
 # Configurar Pusher
+def notificarActualizacizarTelefonoArchivo():
 pusher_client = pusher.Pusher(
     app_id="1867163",
     key="2358693f2b619b363f59",
@@ -23,6 +24,7 @@ pusher_client = pusher.Pusher(
     cluster="us2",
     ssl=True
 )
+    pusher_client.trigger("CanalPago_curso", "pago-curso", args)
 
 # Página principal
 @app.route("/")
@@ -36,40 +38,51 @@ def buscar():
         con.reconnect()
 
     cursor = con.cursor()
-    cursor.execute("SELECT * FROM tst0_cursos_pagos ORDER BY Id_Curso_Pago DESC")
+    cursor.execute("""
+    "SELECT  Id_Curso_Pago  Telefono, Archivo FROM tst0_cursos_pagos 
+    ORDER BY Id_Curso_Pago DESC
+    LIMIT 10 OFFSET 0
+    """)
+    
     registros = cursor.fetchall()
 
     con.close()
 
-    return registros
-
+    return make_response(jsonify(registros))
 # Ruta para registrar un nuevo pago y activar el evento Pusher
-@app.route("/registrar", methods=["GET"])
+@app.route("/registrar", methods=["POST"])
 def registrar():
-    args = request.args
-
     if not con.is_connected():
         con.reconnect()
-
-    cursor = con.cursor()
-    # Insertar el registro en la base de datos
-    sql = "INSERT INTO tst0_cursos_pagos (Telefono, Archivo ) VALUES (%s, %s)"
-    val = (
-        args["Telefono"], 
-        args["Archivo"], 
-
-    )
-    cursor.execute(sql, val)
+                                 
+    id       = request.form["id"]
+    Telefono = request.form["Telefono"]
+    Archivo  = request.form["Archivo"]
     
-    # Confirmar los cambios
+    cursor = con.cursor()
+
+    if id:
+        sql = """
+        UPDATE tst0_cursos_pagos SET
+        Telefono = %s,
+        Archivo     = %s
+        WHERE Id_Curso_Pago = %s
+        """
+        val = (Telefono, Archivo, id)
+    else:
+        sql = """
+        INSERT INTO tst0_cursos_pagos (Telefono, Archivo)
+                        VALUES (%s,          %s)
+        """
+        val =                  (Telefono, Archivo)
+    
+    cursor.execute(sql, val)
     con.commit()
     cursor.close()
 
-    # Activar el evento en Pusher
-    pusher_client.trigger("CanalPago_curso", "pago-curso", args)
+    notificarActualizacizarTelefonoArchivo()    
+    return make_response(jsonify({}))
     
-    return "Evento registrado con éxito"
-
 # Iniciar la aplicación
 if __name__ == "__main__":
     app.run(debug=True)
