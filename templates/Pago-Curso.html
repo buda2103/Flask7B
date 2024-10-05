@@ -127,8 +127,8 @@
                             <td>${Pagocurso[Archivo]}</td>
                             <td>
                             
-                                <button class="btn btn-primary btn-editar" data-id="${Pagocurso["Id_Log"]}">Editar</button>
-                                <button class="btn btn-warning btn-eliminar" data-id="${Pagocurso["Id_Log"]}">Eliminar</button>
+                                <button class="btn btn-primary btn-editar" data-id="${Pagocurso["Id_Curso_Pago"]}">Editar</button>
+                                <button class="btn btn-warning btn-eliminar" data-id="${Pagocurso["Id_Curso_Pago"]}">Eliminar</button>
                             </td>
                         </tr>`)
                     }
@@ -144,7 +144,7 @@
                     var Pagocurso = respuesta[0]
 
                     $("#id")
-                    .val(Pagocurso["Id_Log"])
+                    .val(Pagocurso["Id_Curso_Pago"])
                     .trigger("focus")
 
                     $("#Telefono").val(Pagocurso["Telefono"])
