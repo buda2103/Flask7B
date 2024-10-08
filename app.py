@@ -2,19 +2,14 @@ from flask import Flask, render_template, request, jsonify, make_response
 import pusher
 import mysql.connector
 
-# Configuración de la base de datos
-#con = mysql.connector.connect(
-#    host="185.232.14.52",
- #   database="u760464709_tst_sep",
- #   user="u760464709_tst_sep_usr",
-  #  password="dJ0CIAFF="
-#)
-con = mysql.connector.connect(
-    host="DESKTOP-DDL2OKE\SQLEXPRESS",
-    database="Formulario",
-    user="JuanDavidadmi",
-    password="Robledo19"
+ Configuración de la base de datos
+ con = mysql.connector.connect(
+    host="185.232.14.52",
+    database="u760464709_tst_sep",
+    user="u760464709_tst_sep_usr",
+    password="dJ0CIAFF="
 )
+
 
 # Inicializar la aplicación Flask
 app = Flask(__name__)
@@ -34,8 +29,8 @@ def notificarActualizacionTelefonoArchivo():
 # Página principal
 @app.route("/")
 def index():
-     return render_template("Formulario.html")
-  #  return render_template("Pago-Curso.html")
+     #return render_template("Formulario.html")
+      return render_template("Pago-Curso.html")
 
 # Ruta para buscar pagos en la base de datos
 @app.route("/buscar")
