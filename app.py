@@ -28,7 +28,8 @@ def notificarActualizacionTelefonoArchivo():
 # Página principal
 @app.route("/")
 def index():
-    return render_template("Pago-Curso.html")
+     return render_template("Formulario.html")
+  #  return render_template("Pago-Curso.html")
 
 # Ruta para buscar pagos en la base de datos
 @app.route("/buscar")
