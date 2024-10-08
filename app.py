@@ -2,8 +2,8 @@ from flask import Flask, render_template, request, jsonify, make_response
 import pusher
 import mysql.connector
 
- Configuración de la base de datos
- con = mysql.connector.connect(
+# Configuración de la base de datos
+    con = mysql.connector.connect(
     host="185.232.14.52",
     database="u760464709_tst_sep",
     user="u760464709_tst_sep_usr",
