@@ -86,7 +86,7 @@ def registrar():
 
 # Ruta para editar un registro existente
 @app.route("/editar", methods=["GET"])
-def editar_usuario(id_usuario):
+def editar():
     if not con.is_connected():
         con.reconnect()
 
