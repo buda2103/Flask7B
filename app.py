@@ -85,7 +85,7 @@ def registrar():
     return make_response(jsonify({}))
 
 # Ruta para editar un registro existente
-@app.route("/usuarios/editar/<int:id_usuario>", methods=["GET"])
+@app.route("/editar", methods=["GET"])
 def editar_usuario(id_usuario):
     if not con.is_connected():
         con.reconnect()
