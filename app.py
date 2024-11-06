@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify, make_response
 import pusher
 import mysql.connector
+from flask_cors import CORS, cross_origin
 
 # Configuración de la base de datos
 con = mysql.connector.connect(
@@ -13,7 +14,7 @@ con = mysql.connector.connect(
 
 # Inicializar la aplicación Flask
 app = Flask(__name__)
-
+CORS(app)
 # Configurar Pusher
 pusher_client = pusher.Pusher(
     app_id="1867163",
